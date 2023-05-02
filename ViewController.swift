@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITextFieldDelegate {
     
     private lazy var backgroundView: UIImageView = {
         let view = UIImageView()
@@ -35,7 +35,7 @@ class ViewController: UIViewController {
             pointSize: 40, weight: .medium, scale: .default)
         let image = UIImage(systemName: "location.circle.fill", withConfiguration: config)
         button.setImage(image, for: .normal)
-        button.tintColor = .black
+        button.tintColor = UIColor(named: "ColorText")
         button.translatesAutoresizingMaskIntoConstraints = false
         // button.addTarget(self, action: #selector(locationPressed), for: .touchUpInside)
         return button
@@ -47,7 +47,7 @@ class ViewController: UIViewController {
             pointSize: 40, weight: .medium, scale: .default)
         let image = UIImage(systemName: "magnifyingglass", withConfiguration: config)
         button.setImage(image, for: .normal)
-        button.tintColor = .black
+        button.tintColor = UIColor(named: "ColorText")
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -58,6 +58,8 @@ class ViewController: UIViewController {
         text.font = UIFont.systemFont(ofSize: 25, weight: .regular)
         text.textColor = .lightGray
         text.textAlignment = .right
+        text.autocapitalizationType = .words
+        text.returnKeyType = .go
         text.backgroundColor = .placeholderText
         text.layer.cornerRadius = 5
         text.translatesAutoresizingMaskIntoConstraints = false
@@ -67,7 +69,7 @@ class ViewController: UIViewController {
     private lazy var conditionView: UIImageView = {
         let view = UIImageView()
         view.image = UIImage(systemName: "sun.max")
-        view.tintColor = .black
+        view.tintColor = UIColor(named: "ColorText")
         view.contentMode = .scaleAspectFill
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -83,6 +85,7 @@ class ViewController: UIViewController {
     private lazy var temperatureLabel1: UILabel = {
         let label = UILabel()
         label.text = "21"
+        label.textColor = UIColor(named: "ColorText")
         label.font = UIFont.systemFont(ofSize: 80, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -91,6 +94,7 @@ class ViewController: UIViewController {
     private lazy var temperatureLabel2: UILabel = {
         let label = UILabel()
         label.text = "°"
+        label.textColor = UIColor(named: "ColorText")
         label.font = UIFont.systemFont(ofSize: 100, weight: .light)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -99,6 +103,7 @@ class ViewController: UIViewController {
     private lazy var temperatureLabel3: UILabel = {
         let label = UILabel()
         label.text = "C"
+        label.textColor = UIColor(named: "ColorText")
         label.font = UIFont.systemFont(ofSize: 100, weight: .light)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -108,13 +113,14 @@ class ViewController: UIViewController {
         let label = UILabel()
         label.text = "Moscow"
         label.font = UIFont.systemFont(ofSize: 30, weight: .regular)
-        label.textColor = .black
+        label.textColor = UIColor(named: "ColorText")
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        searchTextField.delegate = self
         subviews()
         setupConstraints()
     }
