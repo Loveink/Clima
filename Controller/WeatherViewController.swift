@@ -6,14 +6,17 @@
 //
 
 import UIKit
+import CoreLocation
 
-class ViewController: UIViewController, UITextFieldDelegate {
+class WeatherViewController: UIViewController {
+    
+    var weatherManager = WeatherManager()
+    let locationManager = CLLocationManager()
     
     private lazy var backgroundView: UIImageView = {
         let view = UIImageView()
         view.image = UIImage(named: "background")
         view.contentMode = .scaleAspectFill
-//        view.clipsToBounds = true
         view.isUserInteractionEnabled = true
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -37,7 +40,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         button.setImage(image, for: .normal)
         button.tintColor = UIColor(named: "ColorText")
         button.translatesAutoresizingMaskIntoConstraints = false
-        // button.addTarget(self, action: #selector(locationPressed), for: .touchUpInside)
+        button.addTarget(self, action: #selector(locationPressed), for: .touchUpInside)
         return button
     }()
     
@@ -49,6 +52,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         button.setImage(image, for: .normal)
         button.tintColor = UIColor(named: "ColorText")
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(searchPressed), for: .touchUpInside)
         return button
     }()
     
@@ -121,6 +125,11 @@ class ViewController: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         searchTextField.delegate = self
+        weatherManager.delegate = self
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestLocation()
+
         subviews()
         setupConstraints()
     }
@@ -177,5 +186,68 @@ class ViewController: UIViewController, UITextFieldDelegate {
             cityLabel.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor, constant: -20),
             cityLabel.topAnchor.constraint(equalTo: temperatureStackView.bottomAnchor, constant: 10)
         ])
+    }
+}
+
+extension WeatherViewController: UITextFieldDelegate {
+    
+    @objc func searchPressed(_ sender: UIButton) {
+            searchTextField.endEditing(true)
+        }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        searchTextField.endEditing(true)
+        return true
+    }
+    
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        if textField.text != "" {
+            return true
+        } else {
+            textField.placeholder = "Type something"
+            return false
+        }
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if let city = searchTextField.text {
+            weatherManager.fetchWeather(cityName: city)
+        }
+        searchTextField.text = ""
+    }
+}
+
+extension WeatherViewController: WeatherManagerDelegate {
+    
+    func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel) {
+        DispatchQueue.main.async {
+            self.temperatureLabel1.text = weather.temperatureString
+            self.conditionView.image = UIImage(systemName: weather.conditionName)
+            self.cityLabel.text = weather.cityName
+        }
+    }
+    
+    func didFailWithError(error: Error) {
+        print(error)
+    }
+}
+
+extension WeatherViewController: CLLocationManagerDelegate {
+    
+    @objc func locationPressed(_ sender: UIButton) {
+        locationManager.requestLocation()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.last {
+            locationManager.stopUpdatingLocation()
+            let lat = location.coordinate.latitude
+            let lon = location.coordinate.longitude
+            weatherManager.fetchWeather(latitude: lat, longitude: lon)
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
     }
 }
