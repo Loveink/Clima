@@ -192,14 +192,18 @@ class WeatherViewController: UIViewController {
 extension WeatherViewController: UITextFieldDelegate {
     
     @objc func searchPressed(_ sender: UIButton) {
-            searchTextField.endEditing(true)
-        }
+        searchTextField.endEditing(true)
+    }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         searchTextField.endEditing(true)
         return true
     }
     
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        textField.text = ""
+    }
+
     func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
         if textField.text != "" {
             return true
